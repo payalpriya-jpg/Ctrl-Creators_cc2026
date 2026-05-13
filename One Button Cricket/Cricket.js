@@ -6,6 +6,10 @@ let swing = false;
 
 let batAngle = 0;
 
+let score = 0;
+
+let ballHit = false;
+
 function setup() {
 
   createCanvas(
@@ -151,3 +155,44 @@ function keyPressed() {
     swing = true;
   }
 }
+
+function hitBall() {
+
+  let d = dist(
+
+    ball.x,
+    ball.y,
+
+    batsmanX + 35,
+    height - 230
+  );
+
+  if (d < 75) {
+
+    score += 1;
+
+    ballHit = true;
+
+    resetBall();
+  }
+}
+
+function keyPressed() {
+
+  if (keyCode === 32) {
+
+    swing = true;
+
+    hitBall();
+  }
+}
+
+fill(255);
+
+textSize(40);
+
+text(
+  score,
+  width - 100,
+  80
+);
