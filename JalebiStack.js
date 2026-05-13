@@ -2,6 +2,10 @@
 // JALEBI STACK GAME
 // =====================================================
 
+let x = 100;
+
+let dir = 1;
+
 function setup() {
 
   createCanvas(800, 600);
@@ -10,6 +14,22 @@ function setup() {
 function draw() {
 
   background(255, 228, 180);
+
+   drawPlate();
+
+  x += 6 * dir;
+
+  if (x > 690) {
+
+    dir = -1;
+  }
+
+  if (x < 110) {
+
+    dir = 1;
+  }
+
+  drawJalebi(x, 120, 220);
 }
 
 function drawPlate() {
