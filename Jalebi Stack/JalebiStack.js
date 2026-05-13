@@ -10,6 +10,8 @@ let y = 120;
 
 let dir = 1;
 
+let score = 0;
+
 let dropping = false;
 
 function setup() {
@@ -126,3 +128,18 @@ if (pieces.length > 0) {
     w: 220
   });
 }
+
+if (abs(x - top.x) < 8) {
+
+  score += 10;
+
+} else {
+
+  score += 5;
+}
+
+fill(0);
+
+textSize(28);
+
+text("Score: " + score, 20, 40);
