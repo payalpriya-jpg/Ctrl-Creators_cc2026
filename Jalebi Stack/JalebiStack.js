@@ -1,870 +1,451 @@
 // =====================================================
-// ONE BUTTON CRICKET - FINAL HACKATHON VERSION
-// P5.JS
+// REALISTIC JALEBI STACK GAME
 // =====================================================
 
-// ================= VARIABLES =================
+let pieces = [];
 
-let batsmanX;
+let currentPiece;
 
-let ball;
+let moveSpeed = 6;
+
+let gameOver = false;
+let win = false;
 
 let score = 0;
 
-let highScore = 0;
+// Leaderboard
+let leaderboard = [];
 
-let gameOver = false;
+// Plate
+let plateY = 540;
 
-// bat animation
-let swing = false;
-let batAngle = 0;
-
-// hit effect
-let hitEffect = false;
-let hitTimer = 0;
-
-// flying ball
-let ballHit = false;
-let hitVX = 0;
-let hitVY = 0;
-
-// particles
-let particles = [];
-
-// FOUR / SIX popup
-let shotText = "";
-
-let shotTimer = 0;
-
-// wicket
-let stumpHit = false;
-
-// crowd
-let crowdOffset = 0;
-
-// camera shake
-let shakeAmount = 0;
-
-// difficulty
-let difficulty = 0;
-
-// =====================================================
-// SETUP
-// =====================================================
+// Win line
+let winLine = 100;
 
 function setup() {
 
-  createCanvas(
-    windowWidth,
-    windowHeight
-  );
+  createCanvas(800, 600);
 
   rectMode(CENTER);
 
-  textAlign(CENTER);
+  loadLeaderboard();
 
-  batsmanX = width * 0.42;
-
-  resetBall();
-
-  // load high score
-  let saved =
-    localStorage.getItem(
-      "cricketHighScore"
-    );
-
-  if (saved != null) {
-
-    highScore = int(saved);
-  }
+  resetPiece();
 }
-
-// =====================================================
-// DRAW
-// =====================================================
 
 function draw() {
 
-  push();
+  drawSweetShopBackground();
 
-  // camera shake
-  translate(
-    random(-shakeAmount, shakeAmount),
-    random(-shakeAmount, shakeAmount)
-  );
+  // Win line
+  stroke(255, 0, 0);
+  strokeWeight(4);
 
-  shakeAmount *= 0.9;
+  line(0, winLine, width, winLine);
 
-  drawSky();
+  noStroke();
 
-  drawCrowd();
+  fill(255, 0, 0);
 
-  drawGround();
+  textSize(22);
 
-  drawPitch();
-
-  drawStumps();
-
-  drawBatsman();
-
-  drawBall();
-
-  drawParticles();
-
-  drawScore();
-
-  drawShotText();
-
-  if (!gameOver) {
-
-    updateBall();
-
-    updateBat();
-
-    checkMiss();
-  }
-
-  else {
-
-    showGameOver();
-  }
-
-  pop();
-}
-
-// =====================================================
-// SKY
-// =====================================================
-
-function drawSky() {
-
-  background(120, 200, 255);
-
-  // sun
-  fill(255, 220, 0);
-
-  ellipse(
+  text(
+    "WIN LINE",
     width - 120,
-    100,
-    90
-  );
-}
-
-// =====================================================
-// CROWD
-// =====================================================
-
-function drawCrowd() {
-
-  crowdOffset += 0.03;
-
-  for (let y = 0; y < 120; y += 20) {
-
-    for (let x = 0; x < width; x += 20) {
-
-      let r =
-        120 +
-        sin(crowdOffset + x * 0.02) * 50;
-
-      let g =
-        100 +
-        sin(crowdOffset + y * 0.03) * 50;
-
-      let b =
-        150 +
-        sin(crowdOffset + x * 0.01) * 50;
-
-      fill(r, g, b);
-
-      ellipse(
-        x,
-        y,
-        10
-      );
-    }
-  }
-}
-
-// =====================================================
-// GROUND
-// =====================================================
-
-function drawGround() {
-
-  fill(50, 180, 70);
-
-  rect(
-    width / 2,
-    height - 80,
-    width,
-    320
+    winLine - 10
   );
 
-  // boundary line
-  stroke(255);
+  // Plate
+  drawPlate();
 
-  strokeWeight(4);
+  // Leaderboard
+  drawLeaderboard();
 
-  arc(
-    width / 2,
-    height - 20,
-    width * 0.9,
-    220,
-    PI,
-    TWO_PI
-  );
+  // WIN SCREEN
+  if (win) {
 
-  noStroke();
+    saveScore();
 
-  // stadium lights
-  fill(255, 255, 180, 120);
+    fill(0, 180);
 
-  ellipse(120, 90, 90);
+    rect(width / 2, height / 2, width, height);
 
-  ellipse(width - 120, 90, 90);
-}
+    fill(0, 255, 120);
 
-// =====================================================
-// PITCH
-// =====================================================
+    textAlign(CENTER);
 
-function drawPitch() {
+    textSize(60);
 
-  let pitchTop = 170;
-
-  let pitchBottom = height - 150;
-
-  let pitchHeight =
-    pitchBottom - pitchTop;
-
-  // shadow
-  fill(120, 90, 50, 70);
-
-  rect(
-    width / 2 + 8,
-    (pitchTop + pitchBottom) / 2,
-
-    width * 0.16,
-
-    pitchHeight,
-    25
-  );
-
-  // main pitch
-  fill(215, 185, 125);
-
-  rect(
-    width / 2,
-    (pitchTop + pitchBottom) / 2,
-
-    width * 0.16,
-
-    pitchHeight,
-    25
-  );
-
-  // crease lines
-  stroke(255);
-
-  strokeWeight(4);
-
-  // batting crease
-  line(
-    width / 2 - 60,
-    height - 190,
-
-    width / 2 + 60,
-    height - 190
-  );
-
-  // bowling crease
-  line(
-    width / 2 - 60,
-    170,
-
-    width / 2 + 60,
-    170
-  );
-
-  // side lines
-  line(
-    width / 2 - 40,
-    pitchTop,
-
-    width / 2 - 40,
-    pitchBottom
-  );
-
-  line(
-    width / 2 + 40,
-    pitchTop,
-
-    width / 2 + 40,
-    pitchBottom
-  );
-
-  noStroke();
-}
-
-// =====================================================
-// STUMPS
-// =====================================================
-
-function drawStumps() {
-
-  fill(255);
-
-  // batsman stumps
-  if (stumpHit) {
-
-    push();
-
-    translate(
-      batsmanX + 80,
-      height - 180
+    text(
+      "YOU WIN!",
+      width / 2,
+      height / 2 - 40
     );
 
-    rotate(radians(70));
+    fill(255);
 
-    rect(-18, 0, 6, 50);
+    textSize(32);
 
-    rect(0, 0, 6, 50);
-
-    rect(18, 0, 6, 50);
-
-    pop();
-  }
-
-  else {
-
-    rect(
-      batsmanX + 70,
-      height - 180,
-      6,
-      50
+    text(
+      "Final Score: " + score,
+      width / 2,
+      height / 2 + 20
     );
 
-    rect(
-      batsmanX + 85,
-      height - 180,
-      6,
-      50
+    textSize(22);
+
+    text(
+      "Refresh to Play Again",
+      width / 2,
+      height / 2 + 70
     );
 
-    rect(
-      batsmanX + 100,
-      height - 180,
-      6,
-      50
-    );
+    noLoop();
+
+    return;
   }
 
-  // bowler stumps
-  rect(
-    width / 2 - 15,
-    140,
-    6,
-    50
-  );
+  // GAME OVER
+  if (gameOver) {
 
-  rect(
-    width / 2,
-    140,
-    6,
-    50
-  );
+    saveScore();
 
-  rect(
-    width / 2 + 15,
-    140,
-    6,
-    50
-  );
-}
+    fill(0, 180);
 
-// =====================================================
-// BATSMAN
-// =====================================================
+    rect(width / 2, height / 2, width, height);
 
-function drawBatsman() {
+    fill(255, 0, 0);
 
-  push();
+    textAlign(CENTER);
 
-  translate(
-    batsmanX,
-    height - 250
-  );
+    textSize(60);
 
-  // shadow
-  fill(0, 50);
-
-  ellipse(0, 120, 70, 20);
-
-  // legs
-  stroke(255);
-
-  strokeWeight(10);
-
-  line(-12, 40, -18, 110);
-
-  line(12, 40, 18, 110);
-
-  // arms
-  line(-22, -5, 20, 5);
-
-  noStroke();
-
-  // jersey
-  fill(20, 90, 255);
-
-  rect(0, 0, 55, 80, 15);
-
-  // neck
-  fill(255, 220, 180);
-
-  rect(0, -35, 12, 12);
-
-  // head
-  ellipse(0, -55, 45);
-
-  // helmet
-  fill(25);
-
-  arc(
-    0,
-    -60,
-    50,
-    45,
-    PI,
-    TWO_PI
-  );
-
-  // helmet grill
-  stroke(180);
-
-  strokeWeight(2);
-
-  line(10, -55, 18, -40);
-
-  line(5, -55, 13, -38);
-
-  noStroke();
-
-  // ================= BAT =================
-
-  push();
-
-  translate(42, 8);
-
-  rotate(radians(batAngle));
-
-  // handle grip
-  fill(60, 120, 255);
-
-  rect(0, -45, 12, 35, 5);
-
-  // handle wood
-  fill(180, 140, 90);
-
-  rect(0, -15, 10, 35, 5);
-
-  // main bat body
-  fill(230, 200, 140);
-
-  rect(0, 35, 28, 90, 8);
-
-  // bat edges
-  fill(200, 170, 120);
-
-  rect(-10, 35, 5, 85, 5);
-
-  rect(10, 35, 5, 85, 5);
-
-  // sticker
-  fill(255, 60, 60);
-
-  rect(0, 30, 14, 28, 4);
-
-  fill(255);
-
-  rect(0, 5, 10, 18, 3);
-
-  pop();
-
-  pop();
-}
-
-// =====================================================
-// BALL
-// =====================================================
-
-function drawBall() {
-
-  if (hitEffect) {
-
-    fill(255, 220, 100, 120);
-
-    ellipse(
-      ball.x,
-      ball.y,
-      50
-    );
-  }
-
-  fill(220, 0, 0);
-
-  ellipse(
-    ball.x,
-    ball.y,
-    22
-  );
-
-  fill(255);
-
-  ellipse(
-    ball.x - 4,
-    ball.y - 4,
-    5
-  );
-}
-
-// =====================================================
-// UPDATE BALL
-// =====================================================
-
-function updateBall() {
-
-  if (!ballHit) {
-
-    ball.y += ball.speed;
-
-    ball.x += ball.swing;
-
-    if (
-      ball.y >
-      height * 0.6
-    ) {
-
-      ball.speed *= 0.98;
-    }
-  }
-
-  else {
-
-    ball.x += hitVX;
-
-    ball.y += hitVY;
-
-    hitVY += 0.25;
-
-    if (
-      ball.y < -100 ||
-      ball.x < -100 ||
-      ball.x > width + 100
-    ) {
-
-      resetBall();
-
-      ballHit = false;
-    }
-  }
-
-  if (hitEffect) {
-
-    hitTimer--;
-
-    if (hitTimer <= 0) {
-
-      hitEffect = false;
-    }
-  }
-}
-
-// =====================================================
-// RESET BALL
-// =====================================================
-
-function resetBall() {
-
-  ball = {
-
-    x:
-      width / 2 +
-      random(-25, 25),
-
-    y: 140,
-
-    speed:
-      random(4, 5) +
-      difficulty,
-
-    swing:
-      random(-0.5, 0.5)
-  };
-}
-
-// =====================================================
-// BAT ANIMATION
-// =====================================================
-
-function updateBat() {
-
-  if (swing) {
-
-    batAngle -= 15;
-
-    if (batAngle < -95) {
-
-      swing = false;
-    }
-  }
-
-  else {
-
-    batAngle *= 0.8;
-  }
-}
-
-// =====================================================
-// HIT BALL
-// =====================================================
-
-function hitBall() {
-
-  let d = dist(
-
-    ball.x,
-    ball.y,
-
-    batsmanX + 35,
-    height - 230
-  );
-
-  if (
-    d < 75 &&
-    ball.y > height - 320
-  ) {
-
-    let runType;
-
-    // SIX
-    if (d < 35) {
-
-      runType = 6;
-
-      hitVX = random(-4, 4);
-
-      hitVY = random(-20, -17);
-
-      shakeAmount = 10;
-    }
-
-    // FOUR
-    else {
-
-      runType = 4;
-
-      hitVX = random(-7, 7);
-
-      hitVY = random(-15, -12);
-
-      shakeAmount = 5;
-    }
-
-    score += runType;
-
-    shotText = runType;
-
-    shotTimer = 45;
-
-    hitEffect = true;
-
-    hitTimer = 10;
-
-    ballHit = true;
-
-    createHitParticles();
-
-    difficulty += 0.03;
-  }
-}
-
-// =====================================================
-// MISS CHECK
-// =====================================================
-
-function checkMiss() {
-
-  if (
-    !ballHit &&
-    ball.y > height - 160
-  ) {
-
-    gameOver = true;
-
-    stumpHit = true;
-
-    if (score > highScore) {
-
-      highScore = score;
-
-      localStorage.setItem(
-        "cricketHighScore",
-        highScore
-      );
-    }
-  }
-}
-
-// =====================================================
-// PARTICLES
-// =====================================================
-
-function createHitParticles() {
-
-  for (let i = 0; i < 25; i++) {
-
-    particles.push({
-
-      x: ball.x,
-
-      y: ball.y,
-
-      vx: random(-6, 6),
-
-      vy: random(-6, 6),
-
-      life: 255
-    });
-  }
-}
-
-function drawParticles() {
-
-  for (
-    let i = particles.length - 1;
-    i >= 0;
-    i--
-  ) {
-
-    let p = particles[i];
-
-    fill(
-      255,
-      220,
-      120,
-      p.life
+    text(
+      "GAME OVER",
+      width / 2,
+      height / 2 - 40
     );
 
-    ellipse(
+    fill(255);
+
+    textSize(32);
+
+    text(
+      "Final Score: " + score,
+      width / 2,
+      height / 2 + 20
+    );
+
+    textSize(22);
+
+    text(
+      "Refresh to Play Again",
+      width / 2,
+      height / 2 + 70
+    );
+
+    noLoop();
+
+    return;
+  }
+
+  // Draw placed jalebis
+  for (let p of pieces) {
+
+    drawJalebi(
       p.x,
       p.y,
-      8
+      p.w
     );
-
-    p.x += p.vx;
-
-    p.y += p.vy;
-
-    p.life -= 8;
-
-    if (p.life <= 0) {
-
-      particles.splice(i, 1);
-    }
   }
-}
 
-// =====================================================
-// SCOREBOARD
-// =====================================================
+  // Update current piece
+  updateCurrentPiece();
 
-function drawScore() {
-
-  fill(0, 160);
-
-  rect(
-    width - 120,
-    80,
-    180,
-    120,
-    15
+  // Draw active piece
+  drawJalebi(
+    currentPiece.x,
+    currentPiece.y,
+    currentPiece.w
   );
 
-  fill(255);
+  // UI
+  fill(0);
 
-  textSize(20);
+  textAlign(LEFT);
 
-  text(
-    "SCORE",
-    width - 120,
-    50
-  );
+  textSize(28);
 
-  textSize(34);
-
-  text(
-    score,
-    width - 120,
-    90
-  );
-
-  fill(255, 220, 0);
+  text("Score: " + score, 20, 40);
 
   textSize(18);
 
   text(
-    "HIGH SCORE",
-    width - 120,
-    125
-  );
-
-  textSize(24);
-
-  text(
-    highScore,
-    width - 120,
-    155
+    "Press SPACEBAR to Drop",
+    20,
+    75
   );
 }
 
 // =====================================================
-// FOUR / SIX TEXT
+// UPDATE CURRENT PIECE
 // =====================================================
+function updateCurrentPiece() {
 
-function drawShotText() {
+  // Horizontal movement
+  if (!currentPiece.dropping) {
 
-  if (shotTimer > 0) {
+    currentPiece.x +=
+      moveSpeed * currentPiece.dir;
 
-    if (shotText == 6) {
+    // Bounce
+    if (
+      currentPiece.x >
+      width - currentPiece.w / 2
+    ) {
 
-      fill(255, 215, 0);
+      currentPiece.dir = -1;
     }
 
-    else {
+    if (
+      currentPiece.x <
+      currentPiece.w / 2
+    ) {
 
-      fill(0, 220, 255);
+      currentPiece.dir = 1;
+    }
+  }
+
+  // Falling
+  else {
+
+    currentPiece.y += 10;
+
+    // FIRST PIECE
+    if (
+      pieces.length === 0 &&
+      currentPiece.y >= 500
+    ) {
+
+      currentPiece.y = 500;
+
+      pieces.push({
+        x: currentPiece.x,
+        y: currentPiece.y,
+        w: currentPiece.w
+      });
+
+      score += 10;
+
+      resetPiece();
     }
 
-    textSize(120);
+    // STACK COLLISION
+    else if (pieces.length > 0) {
 
-    text(
-      shotText,
-      width / 2,
-      height / 2
-    );
+      let top =
+        pieces[pieces.length - 1];
 
-    shotTimer--;
+      if (
+        currentPiece.y >= top.y - 40
+      ) {
+
+        stackPiece(top);
+      }
+    }
   }
 }
 
 // =====================================================
-// GAME OVER
+// STACKING LOGIC
 // =====================================================
+function stackPiece(top) {
 
-function showGameOver() {
+  let overlap =
+    min(
+      currentPiece.x + currentPiece.w / 2,
+      top.x + top.w / 2
+    ) -
+    max(
+      currentPiece.x - currentPiece.w / 2,
+      top.x - top.w / 2
+    );
 
-  fill(0, 180);
+  // Completely missed
+  if (overlap <= 0) {
+
+    gameOver = true;
+
+    return;
+  }
+
+  // Perfect
+  if (
+    abs(currentPiece.x - top.x) < 8
+  ) {
+
+    score += 10;
+
+    currentPiece.x = top.x;
+  }
+
+  // Imperfect
+  else {
+
+    score += 5;
+  }
+
+  // Shrink piece
+  currentPiece.w = overlap;
+
+  // Too small
+  if (currentPiece.w < 25) {
+
+    gameOver = true;
+
+    return;
+  }
+
+  // Place piece
+  currentPiece.y = top.y - 40;
+
+  pieces.push({
+    x: currentPiece.x,
+    y: currentPiece.y,
+    w: currentPiece.w
+  });
+
+  // Win check
+  if (
+    currentPiece.y <= winLine + 30
+  ) {
+
+    win = true;
+  }
+
+  // Increase difficulty
+  moveSpeed += 0.25;
+
+  resetPiece(currentPiece.w);
+}
+
+// =====================================================
+// RESET PIECE
+// =====================================================
+function resetPiece(w = 220) {
+
+  currentPiece = {
+
+    x: 100,
+    y: 80,
+
+    w: w,
+
+    dir: 1,
+
+    dropping: false
+  };
+}
+
+// =====================================================
+// DRAW JALEBI
+// =====================================================
+function drawJalebi(x, y, w) {
+
+  noFill();
+
+  stroke(255, 140, 0);
+
+  strokeWeight(8);
+
+  // Outer spiral
+  ellipse(x, y, w, 45);
+
+  // Inner spiral
+  ellipse(x, y, w * 0.45, 20);
+
+  // Shine
+  stroke(255, 220, 120, 150);
+
+  arc(
+    x,
+    y,
+    w * 0.8,
+    30,
+    PI,
+    TWO_PI
+  );
+
+  noStroke();
+}
+
+// =====================================================
+// DRAW PLATE
+// =====================================================
+function drawPlate() {
+
+  fill(230);
+
+  ellipse(
+    width / 2,
+    plateY,
+    420,
+    70
+  );
+
+  fill(245);
+
+  ellipse(
+    width / 2,
+    plateY - 10,
+    380,
+    45
+  );
+}
+
+// =====================================================
+// SWEET SHOP BACKGROUND
+// =====================================================
+function drawSweetShopBackground() {
+
+  background(255, 228, 180);
+
+  noStroke();
+
+  // Shelves
+  for (let i = 0; i < 6; i++) {
+
+    fill(180, 120, 70, 90);
+
+    rect(
+      width / 2,
+      80 + i * 70,
+      700,
+      18,
+      10
+    );
+  }
+
+  // Sweet jars
+  for (let i = 0; i < 10; i++) {
+
+    fill(
+      255,
+      random(150, 220),
+      0,
+      70
+    );
+
+    ellipse(
+      100 + i * 70,
+      70,
+      40,
+      40
+    );
+  }
+
+  // Blur overlay
+  fill(255, 255, 255, 25);
 
   rect(
     width / 2,
@@ -872,91 +453,90 @@ function showGameOver() {
     width,
     height
   );
+}
 
-  fill(255, 0, 0);
+// =====================================================
+// LEADERBOARD
+// =====================================================
+function loadLeaderboard() {
 
-  textSize(90);
+  let data =
+    localStorage.getItem(
+      "jalebiLeaderboard"
+    );
 
-  text(
-    "OUT!",
-    width / 2,
-    height / 2 - 40
-  );
+  if (data) {
+
+    leaderboard = JSON.parse(data);
+  }
+}
+
+function saveScore() {
+
+  if (!leaderboard.includes(score)) {
+
+    leaderboard.push(score);
+
+    leaderboard.sort(
+      (a, b) => b - a
+    );
+
+    leaderboard =
+      leaderboard.slice(0, 5);
+
+    localStorage.setItem(
+      "jalebiLeaderboard",
+      JSON.stringify(leaderboard)
+    );
+  }
+}
+
+function drawLeaderboard() {
+
+  fill(0, 120);
+
+  rect(690, 170, 180, 180, 15);
 
   fill(255);
 
-  textSize(30);
+  textAlign(CENTER);
 
-  text(
-    "Press R to Restart",
-    width / 2,
-    height / 2 + 40
-  );
+  textSize(24);
+
+  text("Leaderboard", 690, 110);
+
+  textSize(20);
+
+  for (
+    let i = 0;
+    i < leaderboard.length;
+    i++
+  ) {
+
+    text(
+      (i + 1) +
+      ". " +
+      leaderboard[i],
+
+      690,
+      145 + i * 28
+    );
+  }
 }
 
 // =====================================================
 // CONTROLS
 // =====================================================
-
 function keyPressed() {
 
   // SPACEBAR
   if (
     keyCode === 32 &&
-    !gameOver
+    !currentPiece.dropping
   ) {
 
-    swing = true;
-
-    hitBall();
-  }
-
-  // RESTART
-  if (
-    (key === 'r' ||
-    key === 'R') &&
-    gameOver
-  ) {
-
-    restartGame();
+    currentPiece.dropping = true;
   }
 
   return false;
-}
-
-// =====================================================
-// RESTART
-// =====================================================
-
-function restartGame() {
-
-  score = 0;
-
-  difficulty = 0;
-
-  gameOver = false;
-
-  batAngle = 0;
-
-  particles = [];
-
-  stumpHit = false;
-
-  ballHit = false;
-
-  resetBall();
-}
-
-// =====================================================
-// RESPONSIVE RESIZE
-// =====================================================
-
-function windowResized() {
-
-  resizeCanvas(
-    windowWidth,
-    windowHeight
-  );
-
-  batsmanX = width * 0.42;
 }
