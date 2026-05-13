@@ -21,43 +21,43 @@ function draw() {
 
   background(255, 228, 180);
 
-   drawPlate();
+  drawPlate();
 
-// Horizontal movement
-if (!dropping) {
-  x += 6 * dir;
+  // Horizontal movement
+  if (!dropping) {
+    x += 6 * dir;
 
-  if (x > 690) {
+    if (x > 690) {
+      dir = -1;
+    }
 
-    dir = -1;
+    if (x < 110) {
+      dir = 1;
+    }
   }
+  // Falling
+  else {
+    y += 10;
 
-  if (x < 110) {
+    if (y >= 500) {
+      pieces.push({
+        x: x,
+        y: 500,
+        w: 220
+      });
 
-    dir = 1;
+      x = 100;
+      y = 120;
+
+      dropping = false;
+    }
   }
-
-// Falling
-else {
-
-  y += 10;
-
-  if (y >= 500) {
-
-    pieces.push({
-      x: x,
-      y: 500,
-      w: 220
-    });
-
-    x = 100;
-    y = 120;
-
-    dropping = false;
-  }
-}
 
   drawJalebi(x, y, 220);
+
+  for (let p of pieces) {
+    drawJalebi(p.x, p.y, p.w);
+  }
 }
 
 function keyPressed() {
@@ -97,4 +97,32 @@ function drawJalebi(x, y, w) {
 for (let p of pieces) {
 
   drawJalebi(p.x, p.y, p.w);
+}
+if (pieces.length > 0) {
+
+  let top = pieces[pieces.length - 1];
+
+  let overlap =
+    min(x + 110, top.x + top.w / 2)
+    -
+    max(x - 110, top.x - top.w / 2);
+
+  if (overlap <= 0) {
+
+    noLoop();
+  }
+
+  pieces.push({
+    x: x,
+    y: top.y - 40,
+    w: overlap
+  });
+
+} else {
+
+  pieces.push({
+    x: x,
+    y: 500,
+    w: 220
+  });
 }
