@@ -53,3 +53,10 @@ A fast-paced cricket batting game where timing is everything.
   Key                  Action
 SPACEBAR              Swing Bat
   "R"                 Restart
+
+Hackathon Theme
+
+This project was developed for the under the theme:
+
+One-Button Games (Indian Context)
+Design simple and engaging games controlled using only ONE button/key while incorporating Indian themes and creativity.
