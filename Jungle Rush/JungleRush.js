@@ -4,6 +4,10 @@ let jumpY = 0;
 let velocityY = 0;
 let isJumping = false;
 
+let sky = map(sin(frameCount * 0.002), -1, 1, 40, 180);
+
+background(30, sky, 60);
+
 if (!gameStarted) {
 
   showStartScreen();
