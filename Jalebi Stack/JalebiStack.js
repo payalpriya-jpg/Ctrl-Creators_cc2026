@@ -1,33 +1,32 @@
 // =====================================================
-// JALEBI STACK GAME
+// REALISTIC JALEBI STACK GAME
 // =====================================================
 
 let pieces = [];
 
 let currentPiece;
 
-let moveSpeed = 5;
+let moveSpeed = 6;
 
 let gameOver = false;
 let win = false;
 
 let score = 0;
 
+// Leaderboard
 let leaderboard = [];
 
-// responsive values
-let plateY;
-let winLine;
+// Plate
+let plateY = 540;
+
+// Win line
+let winLine = 100;
 
 function setup() {
 
-  createCanvas(windowWidth, windowHeight);
-
-  frameRate(90);
+  createCanvas(800, 600);
 
   rectMode(CENTER);
-
-  calculateResponsiveValues();
 
   loadLeaderboard();
 
@@ -38,9 +37,8 @@ function draw() {
 
   drawSweetShopBackground();
 
-  // WIN LINE
+  // Win line
   stroke(255, 0, 0);
-
   strokeWeight(4);
 
   line(0, winLine, width, winLine);
@@ -49,11 +47,11 @@ function draw() {
 
   fill(255, 0, 0);
 
-  textSize(width * 0.02);
+  textSize(22);
 
   text(
     "WIN LINE",
-    width - width * 0.15,
+    width - 120,
     winLine - 10
   );
 
@@ -76,7 +74,7 @@ function draw() {
 
     textAlign(CENTER);
 
-    textSize(width * 0.07);
+    textSize(60);
 
     text(
       "YOU WIN!",
@@ -86,7 +84,7 @@ function draw() {
 
     fill(255);
 
-    textSize(width * 0.035);
+    textSize(32);
 
     text(
       "Final Score: " + score,
@@ -94,7 +92,7 @@ function draw() {
       height / 2 + 20
     );
 
-    textSize(width * 0.025);
+    textSize(22);
 
     text(
       "Refresh to Play Again",
@@ -120,7 +118,7 @@ function draw() {
 
     textAlign(CENTER);
 
-    textSize(width * 0.07);
+    textSize(60);
 
     text(
       "GAME OVER",
@@ -130,7 +128,7 @@ function draw() {
 
     fill(255);
 
-    textSize(width * 0.035);
+    textSize(32);
 
     text(
       "Final Score: " + score,
@@ -138,7 +136,7 @@ function draw() {
       height / 2 + 20
     );
 
-    textSize(width * 0.025);
+    textSize(22);
 
     text(
       "Refresh to Play Again",
@@ -161,7 +159,7 @@ function draw() {
     );
   }
 
-  // Update piece
+  // Update current piece
   updateCurrentPiece();
 
   // Draw active piece
@@ -176,15 +174,11 @@ function draw() {
 
   textAlign(LEFT);
 
-  textSize(width * 0.03);
+  textSize(28);
 
-  text(
-    "Score: " + score,
-    20,
-    40
-  );
+  text("Score: " + score, 20, 40);
 
-  textSize(width * 0.018);
+  textSize(18);
 
   text(
     "Press SPACEBAR to Drop",
@@ -194,20 +188,8 @@ function draw() {
 }
 
 // =====================================================
-// RESPONSIVE VALUES
-// =====================================================
-
-function calculateResponsiveValues() {
-
-  plateY = height * 0.9;
-
-  winLine = height * 0.15;
-}
-
-// =====================================================
 // UPDATE CURRENT PIECE
 // =====================================================
-
 function updateCurrentPiece() {
 
   // Horizontal movement
@@ -237,15 +219,15 @@ function updateCurrentPiece() {
   // Falling
   else {
 
-    currentPiece.y += 14;
+    currentPiece.y += 10;
 
     // FIRST PIECE
     if (
       pieces.length === 0 &&
-      currentPiece.y >= height * 0.83
+      currentPiece.y >= 500
     ) {
 
-      currentPiece.y = height * 0.83;
+      currentPiece.y = 500;
 
       pieces.push({
         x: currentPiece.x,
@@ -265,7 +247,7 @@ function updateCurrentPiece() {
         pieces[pieces.length - 1];
 
       if (
-        currentPiece.y >= top.y - height * 0.065
+        currentPiece.y >= top.y - 40
       ) {
 
         stackPiece(top);
@@ -277,7 +259,6 @@ function updateCurrentPiece() {
 // =====================================================
 // STACKING LOGIC
 // =====================================================
-
 function stackPiece(top) {
 
   let overlap =
@@ -290,7 +271,7 @@ function stackPiece(top) {
       top.x - top.w / 2
     );
 
-  // Missed
+  // Completely missed
   if (overlap <= 0) {
 
     gameOver = true;
@@ -314,11 +295,11 @@ function stackPiece(top) {
     score += 5;
   }
 
-  // Shrink
+  // Shrink piece
   currentPiece.w = overlap;
 
   // Too small
-  if (currentPiece.w < width * 0.03) {
+  if (currentPiece.w < 25) {
 
     gameOver = true;
 
@@ -326,8 +307,7 @@ function stackPiece(top) {
   }
 
   // Place piece
-  currentPiece.y =
-    top.y - height * 0.065;
+  currentPiece.y = top.y - 40;
 
   pieces.push({
     x: currentPiece.x,
@@ -335,7 +315,7 @@ function stackPiece(top) {
     w: currentPiece.w
   });
 
-  // Win
+  // Win check
   if (
     currentPiece.y <= winLine + 30
   ) {
@@ -344,7 +324,7 @@ function stackPiece(top) {
   }
 
   // Increase difficulty
-  moveSpeed += 0.3;
+  moveSpeed += 0.25;
 
   resetPiece(currentPiece.w);
 }
@@ -352,16 +332,12 @@ function stackPiece(top) {
 // =====================================================
 // RESET PIECE
 // =====================================================
-
-function resetPiece(
-  w = width * 0.28
-) {
+function resetPiece(w = 220) {
 
   currentPiece = {
 
-    x: width * 0.1,
-
-    y: height * 0.12,
+    x: 100,
+    y: 80,
 
     w: w,
 
@@ -374,7 +350,6 @@ function resetPiece(
 // =====================================================
 // DRAW JALEBI
 // =====================================================
-
 function drawJalebi(x, y, w) {
 
   noFill();
@@ -383,23 +358,20 @@ function drawJalebi(x, y, w) {
 
   strokeWeight(8);
 
-  ellipse(x, y, w, height * 0.07);
+  // Outer spiral
+  ellipse(x, y, w, 45);
 
-  ellipse(
-    x,
-    y,
-    w * 0.45,
-    height * 0.03
-  );
+  // Inner spiral
+  ellipse(x, y, w * 0.45, 20);
 
-  // shine
+  // Shine
   stroke(255, 220, 120, 150);
 
   arc(
     x,
     y,
     w * 0.8,
-    height * 0.05,
+    30,
     PI,
     TWO_PI
   );
@@ -410,7 +382,6 @@ function drawJalebi(x, y, w) {
 // =====================================================
 // DRAW PLATE
 // =====================================================
-
 function drawPlate() {
 
   fill(230);
@@ -418,8 +389,8 @@ function drawPlate() {
   ellipse(
     width / 2,
     plateY,
-    width * 0.5,
-    height * 0.11
+    420,
+    70
   );
 
   fill(245);
@@ -427,36 +398,35 @@ function drawPlate() {
   ellipse(
     width / 2,
     plateY - 10,
-    width * 0.45,
-    height * 0.07
+    380,
+    45
   );
 }
 
 // =====================================================
 // SWEET SHOP BACKGROUND
 // =====================================================
-
 function drawSweetShopBackground() {
 
   background(255, 228, 180);
 
   noStroke();
 
-  // shelves
+  // Shelves
   for (let i = 0; i < 6; i++) {
 
     fill(180, 120, 70, 90);
 
     rect(
       width / 2,
-      80 + i * (height * 0.12),
-      width * 0.8,
+      80 + i * 70,
+      700,
       18,
       10
     );
   }
 
-  // jars
+  // Sweet jars
   for (let i = 0; i < 10; i++) {
 
     fill(
@@ -467,14 +437,14 @@ function drawSweetShopBackground() {
     );
 
     ellipse(
-      width * 0.12 + i * (width * 0.08),
+      100 + i * 70,
       70,
-      width * 0.05,
-      width * 0.05
+      40,
+      40
     );
   }
 
-  // blur overlay
+  // Blur overlay
   fill(255, 255, 255, 25);
 
   rect(
@@ -488,7 +458,6 @@ function drawSweetShopBackground() {
 // =====================================================
 // LEADERBOARD
 // =====================================================
-
 function loadLeaderboard() {
 
   let data =
@@ -526,27 +495,17 @@ function drawLeaderboard() {
 
   fill(0, 120);
 
-  rect(
-    width - width * 0.12,
-    height * 0.28,
-    width * 0.22,
-    height * 0.28,
-    15
-  );
+  rect(690, 170, 180, 180, 15);
 
   fill(255);
 
   textAlign(CENTER);
 
-  textSize(width * 0.025);
+  textSize(24);
 
-  text(
-    "Leaderboard",
-    width - width * 0.12,
-    height * 0.18
-  );
+  text("Leaderboard", 690, 110);
 
-  textSize(width * 0.022);
+  textSize(20);
 
   for (
     let i = 0;
@@ -559,9 +518,8 @@ function drawLeaderboard() {
       ". " +
       leaderboard[i],
 
-      width - width * 0.12,
-
-      height * 0.24 + i * 30
+      690,
+      145 + i * 28
     );
   }
 }
@@ -569,7 +527,6 @@ function drawLeaderboard() {
 // =====================================================
 // CONTROLS
 // =====================================================
-
 function keyPressed() {
 
   // SPACEBAR
@@ -582,18 +539,4 @@ function keyPressed() {
   }
 
   return false;
-}
-
-// =====================================================
-// RESIZE FUNCTION
-// =====================================================
-
-function windowResized() {
-
-  resizeCanvas(
-    windowWidth,
-    windowHeight
-  );
-
-  calculateResponsiveValues();
 }
