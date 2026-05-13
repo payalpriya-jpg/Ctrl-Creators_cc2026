@@ -1,5 +1,7 @@
 let batsmanX;
 
+let ball;
+
 function setup() {
 
   createCanvas(
@@ -12,33 +14,61 @@ function setup() {
   textAlign(CENTER);
 
   batsmanX = width * 0.42;
+
+  resetBall();
 }
 
 function draw() {
 
-  background(120, 200, 255);
+  drawSky();
 
-  fill(50, 180, 70);
+  drawGround();
 
-  rect(
-    width / 2,
-    height - 80,
-    width,
-    320
+  drawPitch();
+
+  drawBatsman();
+
+  drawBall();
+
+  updateBall();
+}
+
+function resetBall() {
+
+  ball = {
+
+    x: width / 2,
+
+    y: 140,
+
+    speed: 5
+  };
+}
+
+function updateBall() {
+
+  ball.y += ball.speed;
+
+  if (ball.y > height) {
+
+    resetBall();
+  }
+}
+
+function drawBall() {
+
+  fill(220, 0, 0);
+
+  ellipse(
+    ball.x,
+    ball.y,
+    22
   );
 }
 
 function drawSky() {
 
   background(120, 200, 255);
-
-  fill(255, 220, 0);
-
-  ellipse(
-    width - 120,
-    100,
-    90
-  );
 }
 
 function drawGround() {
@@ -51,41 +81,17 @@ function drawGround() {
     width,
     320
   );
-
-  stroke(255);
-
-  strokeWeight(4);
-
-  arc(
-    width / 2,
-    height - 20,
-    width * 0.9,
-    220,
-    PI,
-    TWO_PI
-  );
-
-  noStroke();
 }
 
 function drawPitch() {
-
-  let pitchTop = 170;
-
-  let pitchBottom = height - 150;
-
-  let pitchHeight =
-    pitchBottom - pitchTop;
 
   fill(215, 185, 125);
 
   rect(
     width / 2,
-    (pitchTop + pitchBottom) / 2,
-
+    height / 2 + 50,
     width * 0.16,
-
-    pitchHeight,
+    height * 0.6,
     25
   );
 }
@@ -98,18 +104,6 @@ function drawBatsman() {
     batsmanX,
     height - 250
   );
-
-  stroke(255);
-
-  strokeWeight(10);
-
-  line(-12, 40, -18, 110);
-
-  line(12, 40, 18, 110);
-
-  line(-22, -5, 20, 5);
-
-  noStroke();
 
   fill(20, 90, 255);
 
