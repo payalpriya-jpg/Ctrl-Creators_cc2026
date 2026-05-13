@@ -89,3 +89,39 @@ function drawPitch() {
     25
   );
 }
+
+function drawBatsman() {
+
+  push();
+
+  translate(
+    batsmanX,
+    height - 250
+  );
+
+  stroke(255);
+
+  strokeWeight(10);
+
+  line(-12, 40, -18, 110);
+
+  line(12, 40, 18, 110);
+
+  line(-22, -5, 20, 5);
+
+  noStroke();
+
+  fill(20, 90, 255);
+
+  rect(0, 0, 55, 80, 15);
+
+  fill(255, 220, 180);
+
+  ellipse(0, -55, 45);
+
+  fill(180, 140, 90);
+
+  rect(40, 30, 20, 100, 8);
+
+  pop();
+}
