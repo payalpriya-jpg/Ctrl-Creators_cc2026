@@ -4,7 +4,11 @@
 
 let x = 100;
 
+let y = 120;
+
 let dir = 1;
+
+let dropping = false;
 
 function setup() {
 
@@ -17,6 +21,8 @@ function draw() {
 
    drawPlate();
 
+// Horizontal movement
+if (!dropping) {
   x += 6 * dir;
 
   if (x > 690) {
@@ -29,7 +35,21 @@ function draw() {
     dir = 1;
   }
 
-  drawJalebi(x, 120, 220);
+// Falling
+  else {
+
+    y += 10;
+  }
+
+  drawJalebi(x, y, 220);
+}
+
+function keyPressed() {
+
+  if (keyCode === 32) {
+
+    dropping = true;
+  }
 }
 
 function drawPlate() {
@@ -54,17 +74,6 @@ function drawJalebi(x, y, w) {
   ellipse(x, y, w, 45);
 
   ellipse(x, y, w * 0.45, 20);
-
-  stroke(255, 220, 120, 150);
-
-  arc(
-    x,
-    y,
-    w * 0.8,
-    30,
-    PI,
-    TWO_PI
-  );
 
   noStroke();
 }
