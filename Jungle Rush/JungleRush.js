@@ -61,3 +61,14 @@ if (key == ' ' && !isJumping) {
 
   velocityY = 15;
 }
+
+for (let k = 0; k < 15; k++) {
+
+  particles.push({
+    x: x,
+    y: d.y,
+    vx: random(-3, 3),
+    vy: random(-3, 3),
+    life: 255
+  });
+}
