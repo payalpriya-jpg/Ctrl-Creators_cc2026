@@ -2,6 +2,8 @@
 // JALEBI STACK GAME
 // =====================================================
 
+let pieces = [];
+
 let x = 100;
 
 let y = 120;
@@ -36,10 +38,24 @@ if (!dropping) {
   }
 
 // Falling
-  else {
+else {
 
-    y += 10;
+  y += 10;
+
+  if (y >= 500) {
+
+    pieces.push({
+      x: x,
+      y: 500,
+      w: 220
+    });
+
+    x = 100;
+    y = 120;
+
+    dropping = false;
   }
+}
 
   drawJalebi(x, y, 220);
 }
@@ -76,4 +92,9 @@ function drawJalebi(x, y, w) {
   ellipse(x, y, w * 0.45, 20);
 
   noStroke();
+}
+
+for (let p of pieces) {
+
+  drawJalebi(p.x, p.y, p.w);
 }
