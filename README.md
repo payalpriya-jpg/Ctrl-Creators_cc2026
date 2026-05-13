@@ -40,11 +40,9 @@ The project was developed using **JavaScript** and **p5.js** with a focus on ani
 
 ## ✍️ Authors
 
+### Payal Priya
 ### Dhawal Hatiya
-B.Tech CSE (AI & ML)  
-Avantika University, Ujjain
 
-GitHub: https://github.com/your-github-username
 
 ---
 
