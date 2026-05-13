@@ -22,3 +22,29 @@ function drawPlate() {
 
   ellipse(width / 2, 530, 380, 45);
 }
+
+function drawJalebi(x, y, w) {
+
+  noFill();
+
+  stroke(255, 140, 0);
+
+  strokeWeight(8);
+
+  ellipse(x, y, w, 45);
+
+  ellipse(x, y, w * 0.45, 20);
+
+  stroke(255, 220, 120, 150);
+
+  arc(
+    x,
+    y,
+    w * 0.8,
+    30,
+    PI,
+    TWO_PI
+  );
+
+  noStroke();
+}
