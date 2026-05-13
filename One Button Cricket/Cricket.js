@@ -2,6 +2,10 @@ let batsmanX;
 
 let ball;
 
+let swing = false;
+
+let batAngle = 0;
+
 function setup() {
 
   createCanvas(
@@ -118,4 +122,32 @@ function drawBatsman() {
   rect(40, 30, 20, 100, 8);
 
   pop();
+}
+
+function updateBat() {
+
+  if (swing) {
+
+    batAngle -= 15;
+
+    if (batAngle < -95) {
+
+      swing = false;
+    }
+  }
+
+  else {
+
+    batAngle *= 0.8;
+  }
+}
+
+updateBat();
+
+function keyPressed() {
+
+  if (keyCode === 32) {
+
+    swing = true;
+  }
 }
