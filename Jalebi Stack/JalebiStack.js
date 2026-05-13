@@ -143,3 +143,18 @@ fill(0);
 textSize(28);
 
 text("Score: " + score, 20, 40);
+
+if (abs(x - top.x) < 8) {
+
+  score += 10;
+
+} else {
+
+  score += 5;
+}
+
+fill(0);
+
+textSize(28);
+
+text("Score: " + score, 20, 40);
