@@ -1,5 +1,9 @@
 let gameStarted = false;
 
+let jumpY = 0;
+let velocityY = 0;
+let isJumping = false;
+
 if (!gameStarted) {
 
   showStartScreen();
@@ -30,4 +34,26 @@ function showStartScreen() {
 if (key == ' ') {
 
   gameStarted = true;
+}
+translate(horseX, height - height * 0.16);
+
+translate(horseX, height - height * 0.16 - jumpY);
+
+if (isJumping) {
+
+  jumpY += velocityY;
+
+  velocityY -= 0.8;
+
+  if (jumpY < 0) {
+
+    jumpY = 0;
+    isJumping = false;
+  }
+}
+if (key == ' ' && !isJumping) {
+
+  isJumping = true;
+
+  velocityY = 15;
 }
