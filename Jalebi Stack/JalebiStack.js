@@ -4,6 +4,8 @@
 
 let pieces = [];
 
+let gameOver = false;
+
 let x = 100;
 
 let y = 120;
@@ -11,6 +13,8 @@ let y = 120;
 let dir = 1;
 
 let score = 0;
+
+let winLine = 100;
 
 let dropping = false;
 
@@ -60,6 +64,29 @@ function draw() {
   for (let p of pieces) {
     drawJalebi(p.x, p.y, p.w);
   }
+}
+
+stroke(255, 0, 0);
+
+strokeWeight(4);
+
+line(0, winLine, width, winLine);
+
+noStroke();
+
+if (top.y <= winLine + 30) {
+
+  textSize(60);
+
+  fill(0, 255, 0);
+
+  text(
+    "YOU WIN!",
+    width / 2,
+    height / 2
+  );
+
+  noLoop();
 }
 
 function keyPressed() {
@@ -115,10 +142,10 @@ if (pieces.length > 0) {
   }
 
   pieces.push({
-    x: x,
-    y: top.y - 40,
-    w: overlap
-  });
+  x: x,
+  y: top.y - 40,
+  w: overlap
+});
 
 } else {
 
@@ -158,3 +185,27 @@ fill(0);
 textSize(28);
 
 text("Score: " + score, 20, 40);
+
+if (overlap <= 0 || overlap < 25) {
+
+  gameOver = true;
+}
+
+if (gameOver) {
+
+  background(0);
+
+  fill(255, 0, 0);
+
+  textAlign(CENTER);
+
+  textSize(60);
+
+  text(
+    "GAME OVER",
+    width / 2,
+    height / 2
+  );
+
+  noLoop();
+}
