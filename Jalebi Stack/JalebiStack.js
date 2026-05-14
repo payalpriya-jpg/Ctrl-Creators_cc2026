@@ -13,6 +13,11 @@ let win = false;
 
 let score = 0;
 
+// Sound effects
+let backgroundMusic;
+let splashSound;
+let audioUnlocked = false;
+
 // Leaderboard
 let leaderboard = [];
 
@@ -22,7 +27,17 @@ let plateY = 540;
 // Win line
 let winLine = 100;
 
+function preload() {
+  soundFormats('mp3');
+  backgroundMusic = loadSound('../assets/44231991-sitar-215153.mp3');
+  splashSound = loadSound('../assets/universfield-water-splash-02-352021.mp3');
+}
+
 function setup() {
+  if (backgroundMusic) {
+    backgroundMusic.setVolume(0.08);
+    backgroundMusic.loop();
+  }
 
   createCanvas(800, 600);
 
@@ -275,6 +290,7 @@ function stackPiece(top) {
   if (overlap <= 0) {
 
     gameOver = true;
+    playGameOverTone();
 
     return;
   }
@@ -285,8 +301,8 @@ function stackPiece(top) {
   ) {
 
     score += 10;
-
     currentPiece.x = top.x;
+    playPerfectTone();
   }
 
   // Imperfect
@@ -302,6 +318,7 @@ function stackPiece(top) {
   if (currentPiece.w < 25) {
 
     gameOver = true;
+    playGameOverTone();
 
     return;
   }
@@ -529,6 +546,16 @@ function drawLeaderboard() {
 // =====================================================
 function keyPressed() {
 
+  // Start audio context on first user action
+  if (!audioUnlocked) {
+    userStartAudio().then(() => {
+      audioUnlocked = true;
+      if (backgroundMusic && !backgroundMusic.isPlaying()) {
+        backgroundMusic.loop();
+      }
+    });
+  }
+
   // SPACEBAR
   if (
     keyCode === 32 &&
@@ -536,7 +563,52 @@ function keyPressed() {
   ) {
 
     currentPiece.dropping = true;
+    if (splashSound) {
+      splashSound.setVolume(0.5);
+      splashSound.play();
+    }
   }
 
   return false;
+}
+
+function mousePressed() {
+  if (!audioUnlocked) {
+    userStartAudio().then(() => {
+      audioUnlocked = true;
+      if (backgroundMusic && !backgroundMusic.isPlaying()) {
+        backgroundMusic.loop();
+      }
+    });
+  }
+}
+
+function playPerfectTone() {
+  let osc = new p5.Oscillator('triangle');
+  let env = new p5.Envelope();
+  env.setADSR(0.001, 0.12, 0.2, 0.15);
+  env.setRange(0.35, 0);
+  osc.freq(880);
+  osc.amp(env);
+  osc.start();
+  env.play(osc, 0, 0.05);
+  setTimeout(() => osc.stop(), 300);
+}
+
+function playGameOverTone() {
+  let osc = new p5.Oscillator('sine');
+  let env = new p5.Envelope();
+  env.setADSR(0.02, 0.2, 0.0, 0.3);
+  env.setRange(0.4, 0);
+  osc.freq(440);
+  osc.amp(env);
+  osc.start();
+  env.play(osc, 0, 0.05);
+  let fall = setInterval(() => {
+    osc.freq(max(100, osc.freq().value - 40));
+  }, 80);
+  setTimeout(() => {
+    clearInterval(fall);
+    osc.stop();
+  }, 500);
 }

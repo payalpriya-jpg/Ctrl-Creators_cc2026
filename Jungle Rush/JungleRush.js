@@ -16,7 +16,35 @@ let roadLineOffset = 0;
 
 let gameSpeed = 4;
 
+let bgMusic;
+let gallopSound;
+let collectSound;
+let hitSound;
+let laneSound;
+let gameOverSound;
+
+let collisionPlayed = false;
+
+function preload() {
+  soundFormats('mp3');
+  bgMusic = loadSound('sounds/bg.mp3');
+  gallopSound = loadSound('sounds/gallop.mp3');
+  collectSound = loadSound('sounds/collect.mp3');
+  hitSound = loadSound('sounds/hit.mp3');
+  laneSound = loadSound('sounds/lane.mp3');
+  gameOverSound = loadSound('sounds/gameover.mp3');
+}
+
 function setup() {
+  if (bgMusic) {
+    bgMusic.setVolume(0.3);
+    bgMusic.loop();
+  }
+
+  if (gallopSound) {
+    gallopSound.setVolume(0.15);
+    gallopSound.loop();
+  }
 
   createCanvas(windowWidth, windowHeight);
 
@@ -54,6 +82,10 @@ function draw() {
     if (score > 60) {
 
       gameSpeed += 0.0008;
+    }
+
+    if (bgMusic && bgMusic.isLoaded()) {
+      bgMusic.rate(map(gameSpeed, 4, 10, 1, 1.25));
     }
   }
 
@@ -240,6 +272,17 @@ function handleAnimals() {
     ) {
 
       gameOver = true;
+      if (!collisionPlayed) {
+        collisionPlayed = true;
+        if (hitSound) hitSound.play();
+        if (gameOverSound) gameOverSound.play();
+        if (gallopSound && gallopSound.isPlaying()) {
+          gallopSound.stop();
+        }
+        if (bgMusic) {
+          bgMusic.setVolume(0.15);
+        }
+      }
     }
 
     if (a.y > height + 100) {
@@ -432,6 +475,7 @@ function handleDiamonds() {
     ) {
 
       score += 20;
+      if (collectSound) collectSound.play();
 
       diamonds.splice(i, 1);
 
@@ -523,25 +567,21 @@ function showGameOver() {
 function keyPressed() {
 
   if (!gameOver) {
+    let moved = false;
 
-    if (keyCode === LEFT_ARROW) {
-
+    if (keyCode === LEFT_ARROW && playerLane > 0) {
       playerLane--;
-
-      if (playerLane < 0) {
-
-        playerLane = 0;
-      }
+      moved = true;
     }
 
-    if (keyCode === RIGHT_ARROW) {
-
+    if (keyCode === RIGHT_ARROW && playerLane < 2) {
       playerLane++;
+      moved = true;
+    }
 
-      if (playerLane > 2) {
-
-        playerLane = 2;
-      }
+    if (moved && laneSound) {
+      laneSound.setVolume(0.25);
+      laneSound.play();
     }
   }
 
@@ -567,6 +607,18 @@ function restartGame() {
   gameSpeed = 4;
 
   gameOver = false;
+  collisionPlayed = false;
+
+  if (bgMusic) {
+    bgMusic.setVolume(0.3);
+    if (!bgMusic.isPlaying()) {
+      bgMusic.loop();
+    }
+  }
+
+  if (gallopSound && !gallopSound.isPlaying()) {
+    gallopSound.loop();
+  }
 }
 
 // RESPONSIVE RESIZE
