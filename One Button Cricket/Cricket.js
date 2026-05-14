@@ -15,6 +15,11 @@ let highScore = 0;
 
 let gameOver = false;
 
+let bgMusic;
+let ballHitSound;
+let crowdCheerSound;
+let crowdCheerPlaying = false;
+
 // bat animation
 let swing = false;
 let batAngle = 0;
@@ -49,6 +54,16 @@ let shakeAmount = 0;
 let difficulty = 0;
 
 // =====================================================
+// ASSETS
+// =====================================================
+
+function preload() {
+  bgMusic = loadSound("../assets/background.mp3");
+  ballHitSound = loadSound("../assets/ball hit.mp3");
+  crowdCheerSound = loadSound("../assets/hit.mp3");
+}
+
+// =====================================================
 // SETUP
 // =====================================================
 
@@ -66,6 +81,13 @@ function setup() {
   batsmanX = width * 0.42;
 
   resetBall();
+
+  if (bgMusic) {
+    bgMusic.setVolume(0.12);
+    if (getAudioContext().state === "running") {
+      bgMusic.loop();
+    }
+  }
 
   // load high score
   let saved =
@@ -566,6 +588,11 @@ function updateBall() {
       resetBall();
 
       ballHit = false;
+
+      if (crowdCheerPlaying && crowdCheerSound && crowdCheerSound.isPlaying()) {
+        crowdCheerSound.stop();
+        crowdCheerPlaying = false;
+      }
     }
   }
 
@@ -682,6 +709,17 @@ function hitBall() {
     hitTimer = 10;
 
     ballHit = true;
+
+    if (ballHitSound && ballHitSound.isLoaded()) {
+      ballHitSound.setVolume(0.35);
+      ballHitSound.play();
+    }
+
+    if ((runType === 4 || runType === 6) && crowdCheerSound && crowdCheerSound.isLoaded()) {
+      crowdCheerSound.setVolume(0.45);
+      crowdCheerSound.loop();
+      crowdCheerPlaying = true;
+    }
 
     createHitParticles();
 
@@ -906,6 +944,13 @@ function keyPressed() {
     !gameOver
   ) {
 
+    if (getAudioContext().state !== "running") {
+      userStartAudio();
+      if (bgMusic && !bgMusic.isPlaying()) {
+        bgMusic.loop();
+      }
+    }
+
     swing = true;
 
     hitBall();
@@ -943,6 +988,11 @@ function restartGame() {
   stumpHit = false;
 
   ballHit = false;
+
+  if (crowdCheerPlaying && crowdCheerSound && crowdCheerSound.isPlaying()) {
+    crowdCheerSound.stop();
+    crowdCheerPlaying = false;
+  }
 
   resetBall();
 }
