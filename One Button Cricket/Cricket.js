@@ -1,5 +1,5 @@
 // =====================================================
-// ONE BUTTON CRICKET - FINAL HACKATHON VERSION
+// ONE BUTTON CRICKET - FINAL FIXED VERSION
 // P5.JS
 // =====================================================
 
@@ -38,7 +38,6 @@ let particles = [];
 
 // FOUR / SIX popup
 let shotText = "";
-
 let shotTimer = 0;
 
 // wicket
@@ -58,9 +57,18 @@ let difficulty = 0;
 // =====================================================
 
 function preload() {
-  bgMusic = loadSound("../assets/background.mp3");
-  ballHitSound = loadSound("../assets/ball hit.mp3");
-  crowdCheerSound = loadSound("../assets/hit.mp3");
+
+  bgMusic = loadSound(
+    "../assets/background.mp3"
+  );
+
+  ballHitSound = loadSound(
+    "../assets/ball hit.mp3"
+  );
+
+  crowdCheerSound = loadSound(
+    "../assets/hit.mp3"
+  );
 }
 
 // =====================================================
@@ -83,13 +91,18 @@ function setup() {
   resetBall();
 
   if (bgMusic) {
+
     bgMusic.setVolume(0.12);
-    if (getAudioContext().state === "running") {
+
+    if (
+      getAudioContext().state ===
+      "running"
+    ) {
+
       bgMusic.loop();
     }
   }
 
-  // load high score
   let saved =
     localStorage.getItem(
       "cricketHighScore"
@@ -180,21 +193,35 @@ function drawCrowd() {
 
   crowdOffset += 0.03;
 
-  for (let y = 0; y < 120; y += 20) {
+  for (
+    let y = 0;
+    y < 120;
+    y += 20
+  ) {
 
-    for (let x = 0; x < width; x += 20) {
+    for (
+      let x = 0;
+      x < width;
+      x += 20
+    ) {
 
       let r =
         120 +
-        sin(crowdOffset + x * 0.02) * 50;
+        sin(
+          crowdOffset + x * 0.02
+        ) * 50;
 
       let g =
         100 +
-        sin(crowdOffset + y * 0.03) * 50;
+        sin(
+          crowdOffset + y * 0.03
+        ) * 50;
 
       let b =
         150 +
-        sin(crowdOffset + x * 0.01) * 50;
+        sin(
+          crowdOffset + x * 0.01
+        ) * 50;
 
       fill(r, g, b);
 
@@ -243,7 +270,11 @@ function drawGround() {
 
   ellipse(120, 90, 90);
 
-  ellipse(width - 120, 90, 90);
+  ellipse(
+    width - 120,
+    90,
+    90
+  );
 }
 
 // =====================================================
@@ -254,7 +285,8 @@ function drawPitch() {
 
   let pitchTop = 170;
 
-  let pitchBottom = height - 150;
+  let pitchBottom =
+    height - 150;
 
   let pitchHeight =
     pitchBottom - pitchTop;
@@ -342,65 +374,71 @@ function drawStumps() {
     push();
 
     translate(
-      batsmanX + 80,
+      batsmanX + 82,
       height - 180
     );
 
     rotate(radians(70));
 
-    rect(-18, 0, 6, 50);
+    rect(-14, 0, 6, 55);
 
-    rect(0, 0, 6, 50);
+    rect(0, 0, 6, 55);
 
-    rect(18, 0, 6, 50);
+    rect(14, 0, 6, 55);
 
     pop();
   }
 
   else {
 
+    let stumpX =
+      batsmanX + 82;
+
     rect(
-      batsmanX + 70,
+      stumpX - 14,
       height - 180,
       6,
-      50
+      55
     );
 
     rect(
-      batsmanX + 85,
+      stumpX,
       height - 180,
       6,
-      50
+      55
     );
 
     rect(
-      batsmanX + 100,
+      stumpX + 14,
       height - 180,
       6,
-      50
+      55
     );
   }
 
   // bowler stumps
+  let bowlerStumpX =
+    width / 2;
+
   rect(
-    width / 2 - 15,
+    bowlerStumpX - 14,
     140,
     6,
-    50
+    55
   );
 
   rect(
-    width / 2,
+    bowlerStumpX,
     140,
     6,
-    50
+    55
   );
 
   rect(
-    width / 2 + 15,
+    bowlerStumpX + 14,
     140,
     6,
-    50
+    55
   );
 }
 
@@ -461,7 +499,7 @@ function drawBatsman() {
     TWO_PI
   );
 
-  // helmet grill
+  // grill
   stroke(180);
 
   strokeWeight(2);
@@ -472,37 +510,31 @@ function drawBatsman() {
 
   noStroke();
 
-  // ================= BAT =================
-
+  // BAT
   push();
 
   translate(42, 8);
 
   rotate(radians(batAngle));
 
-  // handle grip
   fill(60, 120, 255);
 
   rect(0, -45, 12, 35, 5);
 
-  // handle wood
   fill(180, 140, 90);
 
   rect(0, -15, 10, 35, 5);
 
-  // main bat body
   fill(230, 200, 140);
 
   rect(0, 35, 28, 90, 8);
 
-  // bat edges
   fill(200, 170, 120);
 
   rect(-10, 35, 5, 85, 5);
 
   rect(10, 35, 5, 85, 5);
 
-  // sticker
   fill(255, 60, 60);
 
   rect(0, 30, 14, 28, 4);
@@ -524,7 +556,12 @@ function drawBall() {
 
   if (hitEffect) {
 
-    fill(255, 220, 100, 120);
+    fill(
+      255,
+      220,
+      100,
+      120
+    );
 
     ellipse(
       ball.x,
@@ -558,16 +595,29 @@ function updateBall() {
 
   if (!ballHit) {
 
+    // downward movement
     ball.y += ball.speed;
 
+    // realistic direction
+    let targetX =
+      batsmanX + 35;
+
+    ball.x = lerp(
+      ball.x,
+      targetX,
+      0.008
+    );
+
+    // small swing
     ball.x += ball.swing;
 
+    // slower near batsman
     if (
       ball.y >
-      height * 0.6
+      height * 0.55
     ) {
 
-      ball.speed *= 0.98;
+      ball.speed *= 0.995;
     }
   }
 
@@ -589,8 +639,14 @@ function updateBall() {
 
       ballHit = false;
 
-      if (crowdCheerPlaying && crowdCheerSound && crowdCheerSound.isPlaying()) {
+      if (
+        crowdCheerPlaying &&
+        crowdCheerSound &&
+        crowdCheerSound.isPlaying()
+      ) {
+
         crowdCheerSound.stop();
+
         crowdCheerPlaying = false;
       }
     }
@@ -615,18 +671,16 @@ function resetBall() {
 
   ball = {
 
-    x:
-      width / 2 +
-      random(-25, 25),
+    x: width / 2,
 
     y: 140,
 
     speed:
-      random(4, 5) +
+      random(5, 6) +
       difficulty,
 
     swing:
-      random(-0.5, 0.5)
+      random(-0.15, 0.15)
   };
 }
 
@@ -679,9 +733,11 @@ function hitBall() {
 
       runType = 6;
 
-      hitVX = random(-4, 4);
+      hitVX =
+        random(-4, 4);
 
-      hitVY = random(-20, -17);
+      hitVY =
+        random(-20, -17);
 
       shakeAmount = 10;
     }
@@ -691,9 +747,11 @@ function hitBall() {
 
       runType = 4;
 
-      hitVX = random(-7, 7);
+      hitVX =
+        random(-7, 7);
 
-      hitVY = random(-15, -12);
+      hitVY =
+        random(-15, -12);
 
       shakeAmount = 5;
     }
@@ -710,14 +768,27 @@ function hitBall() {
 
     ballHit = true;
 
-    if (ballHitSound && ballHitSound.isLoaded()) {
+    if (
+      ballHitSound &&
+      ballHitSound.isLoaded()
+    ) {
+
       ballHitSound.setVolume(0.35);
+
       ballHitSound.play();
     }
 
-    if ((runType === 4 || runType === 6) && crowdCheerSound && crowdCheerSound.isLoaded()) {
+    if (
+      (runType === 4 ||
+      runType === 6) &&
+      crowdCheerSound &&
+      crowdCheerSound.isLoaded()
+    ) {
+
       crowdCheerSound.setVolume(0.45);
+
       crowdCheerSound.loop();
+
       crowdCheerPlaying = true;
     }
 
@@ -760,7 +831,11 @@ function checkMiss() {
 
 function createHitParticles() {
 
-  for (let i = 0; i < 25; i++) {
+  for (
+    let i = 0;
+    i < 25;
+    i++
+  ) {
 
     particles.push({
 
@@ -768,9 +843,11 @@ function createHitParticles() {
 
       y: ball.y,
 
-      vx: random(-6, 6),
+      vx:
+        random(-6, 6),
 
-      vy: random(-6, 6),
+      vy:
+        random(-6, 6),
 
       life: 255
     });
@@ -780,7 +857,8 @@ function createHitParticles() {
 function drawParticles() {
 
   for (
-    let i = particles.length - 1;
+    let i =
+      particles.length - 1;
     i >= 0;
     i--
   ) {
@@ -944,9 +1022,18 @@ function keyPressed() {
     !gameOver
   ) {
 
-    if (getAudioContext().state !== "running") {
+    if (
+      getAudioContext().state !==
+      "running"
+    ) {
+
       userStartAudio();
-      if (bgMusic && !bgMusic.isPlaying()) {
+
+      if (
+        bgMusic &&
+        !bgMusic.isPlaying()
+      ) {
+
         bgMusic.loop();
       }
     }
@@ -989,8 +1076,14 @@ function restartGame() {
 
   ballHit = false;
 
-  if (crowdCheerPlaying && crowdCheerSound && crowdCheerSound.isPlaying()) {
+  if (
+    crowdCheerPlaying &&
+    crowdCheerSound &&
+    crowdCheerSound.isPlaying()
+  ) {
+
     crowdCheerSound.stop();
+
     crowdCheerPlaying = false;
   }
 
