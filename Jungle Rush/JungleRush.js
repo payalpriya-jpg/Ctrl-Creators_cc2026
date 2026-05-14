@@ -16,35 +16,28 @@ let roadLineOffset = 0;
 
 let gameSpeed = 4;
 
-let bgMusic;
-let gallopSound;
+// Sound effects
+let backgroundMusic;
 let collectSound;
-let hitSound;
-let laneSound;
+let crashSound;
 let gameOverSound;
-
-let collisionPlayed = false;
+let audioUnlocked = false;
+let gameOverSoundPlayed = false;
 
 function preload() {
   soundFormats('mp3');
-  bgMusic = loadSound('sounds/bg.mp3');
-  gallopSound = loadSound('sounds/gallop.mp3');
-  collectSound = loadSound('sounds/collect.mp3');
-  hitSound = loadSound('sounds/hit.mp3');
-  laneSound = loadSound('sounds/lane.mp3');
-  gameOverSound = loadSound('sounds/gameover.mp3');
+  backgroundMusic = loadSound('../assets/jungle\ loop.mp3');
+  collectSound = loadSound('../assets/coin\ collect.mp3');
+  crashSound = loadSound('../assets/crash.mp3');
+  gameOverSound = loadSound('../assets/game\ over.mp3');
 }
 
 function setup() {
-  if (bgMusic) {
-    bgMusic.setVolume(0.3);
-    bgMusic.loop();
+  if (backgroundMusic) {
+    backgroundMusic.setVolume(0.1);
+    backgroundMusic.loop();
   }
 
-  if (gallopSound) {
-    gallopSound.setVolume(0.15);
-    gallopSound.loop();
-  }
 
   createCanvas(windowWidth, windowHeight);
 
@@ -82,10 +75,6 @@ function draw() {
     if (score > 60) {
 
       gameSpeed += 0.0008;
-    }
-
-    if (bgMusic && bgMusic.isLoaded()) {
-      bgMusic.rate(map(gameSpeed, 4, 10, 1, 1.25));
     }
   }
 
@@ -272,17 +261,7 @@ function handleAnimals() {
     ) {
 
       gameOver = true;
-      if (!collisionPlayed) {
-        collisionPlayed = true;
-        if (hitSound) hitSound.play();
-        if (gameOverSound) gameOverSound.play();
-        if (gallopSound && gallopSound.isPlaying()) {
-          gallopSound.stop();
-        }
-        if (bgMusic) {
-          bgMusic.setVolume(0.15);
-        }
-      }
+      if (crashSound) crashSound.play();
     }
 
     if (a.y > height + 100) {
@@ -476,7 +455,6 @@ function handleDiamonds() {
 
       score += 20;
       if (collectSound) collectSound.play();
-
       diamonds.splice(i, 1);
 
       continue;
@@ -549,6 +527,11 @@ function drawLeaderboard() {
 
 function showGameOver() {
 
+  if (gameOverSound && !gameOverSoundPlayed) {
+    gameOverSound.play();
+    gameOverSoundPlayed = true;
+  }
+
   fill(255, 0, 0);
 
   textAlign(CENTER);
@@ -566,22 +549,36 @@ function showGameOver() {
 
 function keyPressed() {
 
+  // Start audio context on first user action
+  if (!audioUnlocked) {
+    userStartAudio().then(() => {
+      audioUnlocked = true;
+      if (backgroundMusic && !backgroundMusic.isPlaying()) {
+        backgroundMusic.loop();
+      }
+    });
+  }
+
   if (!gameOver) {
-    let moved = false;
 
-    if (keyCode === LEFT_ARROW && playerLane > 0) {
+    if (keyCode === LEFT_ARROW) {
+
       playerLane--;
-      moved = true;
+
+      if (playerLane < 0) {
+
+        playerLane = 0;
+      }
     }
 
-    if (keyCode === RIGHT_ARROW && playerLane < 2) {
+    if (keyCode === RIGHT_ARROW) {
+
       playerLane++;
-      moved = true;
-    }
 
-    if (moved && laneSound) {
-      laneSound.setVolume(0.25);
-      laneSound.play();
+      if (playerLane > 2) {
+
+        playerLane = 2;
+      }
     }
   }
 
@@ -589,6 +586,17 @@ function keyPressed() {
   if (key === 'r' || key === 'R') {
 
     restartGame();
+  }
+}
+
+function mousePressed() {
+  if (!audioUnlocked) {
+    userStartAudio().then(() => {
+      audioUnlocked = true;
+      if (backgroundMusic && !backgroundMusic.isPlaying()) {
+        backgroundMusic.loop();
+      }
+    });
   }
 }
 
@@ -607,18 +615,8 @@ function restartGame() {
   gameSpeed = 4;
 
   gameOver = false;
-  collisionPlayed = false;
 
-  if (bgMusic) {
-    bgMusic.setVolume(0.3);
-    if (!bgMusic.isPlaying()) {
-      bgMusic.loop();
-    }
-  }
-
-  if (gallopSound && !gallopSound.isPlaying()) {
-    gallopSound.loop();
-  }
+  gameOverSoundPlayed = false;
 }
 
 // RESPONSIVE RESIZE
